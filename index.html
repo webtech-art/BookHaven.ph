@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>BookHaven.ph</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div id="topbar">
+			📚 Free shipping on orders over ₱800 | Nationwide Delivery | GCash,
+			PayMaya, Bank Transfer &amp; COD
+		</div>
+
+		<nav id="navbar">
+			<div class="nav-inner">
+				<div class="logo" onclick="showPage('home')">
+					📖 BookHaven<span>.ph</span>
+				</div>
+				<div class="nav-search">
+					<input
+						type="text"
+						id="search-input"
+						placeholder="Search books, authors, categories..."
+						oninput="handleSearch()"
+					/>
+					<button onclick="handleSearch()">🔍</button>
+				</div>
+				<button
+					class="hamburger"
+					onclick="toggleMobileNav()"
+					id="hamburger-btn"
+				>
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+				<ul class="nav-links">
+					<li><button onclick="showPage('home')">Home</button></li>
+					<li><button onclick="showPage('about')">About</button></li>
+					<li><button onclick="showPage('contact')">Contact</button></li>
+					<li id="orders-nav" class="hidden">
+						<button onclick="showPage('orders')">My Orders</button>
+					</li>
+					<li id="admin-nav" class="hidden">
+						<button onclick="showPage('admin')">Admin</button>
+					</li>
+					<li>
+						<button class="basket-btn" onclick="showPage('basket')">
+							🧺 Basket <span class="basket-count" id="basket-count">0</span>
+						</button>
+					</li>
+					<li id="auth-btn-area">
+						<button class="user-btn" onclick="openModal('login-modal')">
+							👤 Login
+						</button>
+					</li>
+					<li id="user-info-area" class="hidden">
+						<button class="user-btn" onclick="logout()">
+							👤 <span id="user-display-name"></span> · Logout
+						</button>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div id="cat-nav">
+			<div class="cat-nav-inner">
+				<button class="cat-btn active" onclick="filterCategory('All', this)">
+					All Books
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Fiction', this)">
+					Fiction
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Non-Fiction', this)">
+					Non-Fiction
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Children', this)">
+					Children
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Self-Help', this)">
+					Self-Help
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Academic', this)">
+					Academic
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Bestseller', this)">
+					⭐ Bestsellers
+				</button>
+				<button class="cat-btn" onclick="filterCategory('Sale', this)">
+					🔖 On Sale
+				</button>
+			</div>
+		</div>
+
+		<div id="home-page" class="page active">
+			<div id="hero">
+				<div class="hero-content">
+					<h1>Your Next Great Read Awaits</h1>
+					<p>
+						Discover thousands of books across every genre. Delivered straight
+						to your door across the Philippines.
+					</p>
+					<div class="cta-group">
+						<button
+							class="btn-primary"
+							onclick="
+								document
+									.querySelector('.main-layout')
+									.scrollIntoView({ behavior: 'smooth' })
+							"
+						>
+							Browse Books
+						</button>
+						<button class="btn-outline" onclick="showPage('about')">
+							Our Story
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="main-layout">
+				<div id="sidebar">
+					<h3>🔍 Filter Books</h3>
+					<div class="filter-section">
+						<label>Category</label>
+						<select id="filter-cat" onchange="applyFilters()">
+							<option value="">All Categories</option>
+							<option value="Fiction">Fiction</option>
+							<option value="Non-Fiction">Non-Fiction</option>
+							<option value="Children">Children</option>
+							<option value="Self-Help">Self-Help</option>
+							<option value="Academic">Academic</option>
+						</select>
+					</div>
+					<div class="filter-section">
+						<label>Max Price</label>
+						<input
+							type="range"
+							id="filter-price"
+							min="100"
+							max="1000"
+							value="1000"
+							oninput="
+								applyFilters();
+								document.getElementById('price-display').textContent =
+									'₱' + this.value;
+							"
+						/>
+						<div class="price-display" id="price-display">₱1000</div>
+					</div>
+					<div class="filter-section">
+						<label>Minimum Rating</label>
+						<select id="filter-rating" onchange="applyFilters()">
+							<option value="0">Any Rating</option>
+							<option value="4">4+ Stars</option>
+							<option value="4.5">4.5+ Stars</option>
+						</select>
+					</div>
+					<div class="filter-section">
+						<label>Availability</label>
+						<label class="filter-check"
+							><input
+								type="checkbox"
+								id="filter-instock"
+								onchange="applyFilters()"
+							/>
+							In Stock Only</label
+						>
+						<label class="filter-check"
+							><input
+								type="checkbox"
+								id="filter-onsale"
+								onchange="applyFilters()"
+							/>
+							On Sale</label
+						>
+						<label class="filter-check"
+							><input
+								type="checkbox"
+								id="filter-bestseller"
+								onchange="applyFilters()"
+							/>
+							Bestsellers</label
+						>
+					</div>
+					<button class="btn-filter-reset" onclick="resetFilters()">
+						Reset Filters
+					</button>
+				</div>
+
+				<div id="book-list-area">
+					<div class="list-header">
+						<div>
+							<h2 id="list-title">All Books</h2>
+							<div class="result-count" id="result-count"></div>
+						</div>
+						<select
+							class="sort-select"
+							id="sort-select"
+							onchange="applyFilters()"
+						>
+							<option value="default">Sort: Default</option>
+							<option value="price-asc">Price: Low to High</option>
+							<option value="price-desc">Price: High to Low</option>
+							<option value="rating">Highest Rated</option>
+							<option value="title">Title A–Z</option>
+						</select>
+					</div>
+					<div id="book-list"></div>
+				</div>
+			</div>
+		</div>
+
+		<div id="basket-page" class="page">
+			<div
+				id="basket-content"
+				style="max-width: 860px; margin: 0 auto; padding: 28px 24px"
+			></div>
+		</div>
+
+		<div id="orders-page" class="page">
+			<div style="max-width: 900px; margin: 0 auto; padding: 28px 24px">
+				<h2
+					style="
+						font-family: &quot;Playfair Display&quot;, serif;
+						font-size: 28px;
+						color: var(--brown-dark);
+						margin-bottom: 20px;
+					"
+				>
+					My Orders
+				</h2>
+				<div id="orders-list"></div>
+			</div>
+		</div>
+
+		<div id="about-page" class="page">
+			<div style="max-width: 1000px; margin: 0 auto; padding: 40px 24px">
+				<div class="about-hero">
+					<h2>Our Story</h2>
+					<p>
+						BookHaven.ph was born from a simple dream: to create a cozy corner
+						where Filipino book lovers could discover their next favorite read.
+						What started as a small collection in a spare room has grown into a
+						beloved online bookstore serving readers across the Philippines.
+					</p>
+					<br />
+					<p>
+						We believe that every book has the power to transform lives, spark
+						imagination, and connect people across boundaries. Our mission is to
+						make quality books accessible to every Filipino reader.
+					</p>
+				</div>
+
+				<div class="team-section">
+					<h3>Meet the Team</h3>
+					<div class="team-grid">
+						<div class="team-card">
+							<img
+								src="krizza.jpg"
+								alt="Krizza Lee"
+								class="team-avatar"
+								style="
+									width: 80px;
+									height: 80px;
+									border-radius: 50%;
+									object-fit: cover;
+								"
+							/>
+							<div class="team-name">Krizza Lee</div>
+							<div class="team-role">Founder &amp; CEO</div>
+							<div class="team-bio">
+								A lifelong bibliophile who turned her passion into a business.
+								Krizza curates every title in our collection with love and care.
+							</div>
+						</div>
+						<div class="team-card">
+							<img
+								src="eve.jpg"
+								alt="Era Venice"
+								class="team-avatar"
+								style="
+									width: 80px;
+									height: 80px;
+									border-radius: 50%;
+									object-fit: cover;
+								"
+							/>
+							<div class="team-name">Era Venice</div>
+							<div class="team-role">Co-Founder &amp; Head of Operations</div>
+							<div class="team-bio">
+								Ensuring every book reaches its reader in perfect condition. Era
+								manages logistics, supplier relations, and day-to-day
+								operations.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="store-section">
+					<div class="info-card">
+						<h3>📍 Our Store</h3>
+						<div class="contact-item">
+							<span class="contact-icon">📧</span>
+							<div>hello@bookhaven.ph</div>
+						</div>
+						<div class="contact-item">
+							<span class="contact-icon">📞</span>
+							<div>+63 917 123 4567</div>
+						</div>
+						<div class="contact-item">
+							<span class="contact-icon">📍</span>
+							<div>143 ACT Now, Cebu City, Metro Cebu, Philippines</div>
+						</div>
+						<div class="contact-item">
+							<span class="contact-icon">🕐</span>
+							<div>Monday – Saturday, 9:00 AM – 6:00 PM</div>
+						</div>
+						<div class="contact-item">
+							<span class="contact-icon">📘</span>
+							<div>
+								<a
+									href="https://www.facebook.com/search/top?q=bookhaven.ph"
+									target="_blank"
+									style="color: var(--brown-light); font-weight: 700"
+									>Follow us on Facebook</a
+								>
+							</div>
+						</div>
+					</div>
+					<div class="info-card">
+						<h3>📦 Our Suppliers</h3>
+						<table class="suppliers-table">
+							<thead>
+								<tr>
+									<th>Supplier</th>
+									<th>Category</th>
+									<th>Location</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Fully Booked</td>
+									<td>Fiction, Non-Fiction</td>
+									<td>Manila, PH</td>
+								</tr>
+								<tr>
+									<td>National Book Store</td>
+									<td>Academic, Children</td>
+									<td>Nationwide</td>
+								</tr>
+								<tr>
+									<td>Anvil Publishing</td>
+									<td>Filipino Literature</td>
+									<td>Pasig City</td>
+								</tr>
+								<tr>
+									<td>Oxford University Press</td>
+									<td>Academic</td>
+									<td>International</td>
+								</tr>
+								<tr>
+									<td>Penguin Random House</td>
+									<td>Fiction, Self-Help</td>
+									<td>International</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="info-card" style="margin-bottom: 28px">
+					<h3>❓ Frequently Asked Questions</h3>
+					<div class="faq-item">
+						<div class="faq-q" onclick="toggleFaq(this)">
+							How long does delivery take? <span>▼</span>
+						</div>
+						<div class="faq-a">
+							Delivery usually takes 3–7 business days for Metro areas, and 7–14
+							days for provincial addresses. Expedited shipping is available
+							upon request.
+						</div>
+					</div>
+					<div class="faq-item">
+						<div class="faq-q" onclick="toggleFaq(this)">
+							What payment methods are accepted? <span>▼</span>
+						</div>
+						<div class="faq-a">
+							We accept GCash, PayMaya, Bank Transfer (BDO, BPI, UnionBank), and
+							Cash on Delivery (COD) for eligible areas.
+						</div>
+					</div>
+					<div class="faq-item">
+						<div class="faq-q" onclick="toggleFaq(this)">
+							Can I return or exchange a book? <span>▼</span>
+						</div>
+						<div class="faq-a">
+							Yes! We accept returns within 7 days of delivery for damaged or
+							incorrect items. Please contact us at hello@bookhaven.ph with your
+							order number and photos.
+						</div>
+					</div>
+					<div class="faq-item">
+						<div class="faq-q" onclick="toggleFaq(this)">
+							Do you offer bulk or wholesale orders? <span>▼</span>
+						</div>
+						<div class="faq-a">
+							Absolutely! For bulk orders of 10 or more copies, please reach out
+							to us directly for special pricing and arrangements.
+						</div>
+					</div>
+					<div class="faq-item">
+						<div class="faq-q" onclick="toggleFaq(this)">
+							Is my payment information secure? <span>▼</span>
+						</div>
+						<div class="faq-a">
+							Yes. All transactions are encrypted and we never store your
+							payment credentials. GCash and PayMaya transactions are protected
+							by their respective platforms.
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="contact-page" class="page">
+			<div style="max-width: 800px; margin: 0 auto; padding: 40px 24px">
+				<h2
+					style="
+						font-family: &quot;Playfair Display&quot;, serif;
+						font-size: 28px;
+						color: var(--brown-dark);
+						margin-bottom: 6px;
+					"
+				>
+					Contact Us
+				</h2>
+				<p
+					style="font-size: 15px; color: var(--text-light); margin-bottom: 28px"
+				>
+					Your thoughts matter to us. We'd love to hear from you — get in touch
+					anytime.
+				</p>
+				<div class="contact-grid">
+					<div class="contact-form-area">
+						<h3
+							style="
+								font-family: &quot;Playfair Display&quot;, serif;
+								font-size: 18px;
+								color: var(--brown-dark);
+								margin-bottom: 18px;
+							"
+						>
+							Send a Message
+						</h3>
+						<div class="form-group">
+							<label>Your Name</label>
+							<input
+								type="text"
+								id="contact-name"
+								placeholder="Juan dela Cruz"
+							/>
+							<span class="form-error" id="contact-name-err"></span>
+						</div>
+						<div class="form-group">
+							<label>Email Address</label>
+							<input
+								type="email"
+								id="contact-email"
+								placeholder="juan@email.com"
+							/>
+							<span class="form-error" id="contact-email-err"></span>
+						</div>
+						<div class="form-group">
+							<label>Subject</label>
+							<input
+								type="text"
+								id="contact-subject"
+								placeholder="Order inquiry, feedback, etc."
+							/>
+							<span class="form-error" id="contact-subject-err"></span>
+						</div>
+						<div class="form-group">
+							<label>Message</label>
+							<textarea
+								id="contact-msg"
+								rows="4"
+								placeholder="Type your message here..."
+							></textarea>
+							<span class="form-error" id="contact-msg-err"></span>
+						</div>
+						<button class="btn-submit" onclick="submitContact()">
+							Send Message
+						</button>
+						<div class="form-success hidden" id="contact-success">
+							✅ Message sent! We'll get back to you within 1–2 business days.
+						</div>
+					</div>
+					<div class="contact-info-area">
+						<div class="contact-info-card">
+							<div class="contact-info-icon">📧</div>
+							<div class="contact-info-text">
+								<strong>Email</strong>hello@bookhaven.ph
+							</div>
+						</div>
+						<div class="contact-info-card">
+							<div class="contact-info-icon">📞</div>
+							<div class="contact-info-text">
+								<strong>Phone</strong>+63 917 123 4567
+							</div>
+						</div>
+						<div class="contact-info-card">
+							<div class="contact-info-icon">📍</div>
+							<div class="contact-info-text">
+								<strong>Address</strong>143 ACT Now, Cebu City, Metro Cebu,
+								Philippines
+							</div>
+						</div>
+						<div class="contact-info-card">
+							<div class="contact-info-icon">🕐</div>
+							<div class="contact-info-text">
+								<strong>Business Hours</strong>Mon – Sat, 9:00 AM – 6:00 PM
+							</div>
+						</div>
+						<a
+							class="social-link"
+							href="https://www.facebook.com/search/top?q=bookhaven.ph"
+							target="_blank"
+						>
+							<span style="font-size: 20px">📘</span> Find us on Facebook
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="admin-page" class="page">
+			<div class="admin-sidebar">
+				<h3>Admin Panel</h3>
+				<div
+					class="admin-nav-item active"
+					onclick="switchAdminTab('dashboard', this)"
+				>
+					📊 Dashboard
+				</div>
+				<div
+					class="admin-nav-item"
+					onclick="switchAdminTab('orders-admin', this)"
+				>
+					📦 Orders
+				</div>
+				<div
+					class="admin-nav-item"
+					onclick="switchAdminTab('users-admin', this)"
+				>
+					👥 Users
+				</div>
+				<div
+					class="admin-nav-item"
+					onclick="switchAdminTab('inventory-admin', this)"
+				>
+					📚 Inventory
+				</div>
+				<div
+					class="admin-nav-item"
+					onclick="switchAdminTab('suppliers-admin', this)"
+				>
+					🏭 Suppliers
+				</div>
+				<div class="admin-nav-item admin-logout-btn" onclick="logout()">
+					🚪 Logout
+				</div>
+			</div>
+			<div class="admin-content">
+				<div id="dashboard" class="admin-section active">
+					<h2>Dashboard</h2>
+					<div class="stats-grid" id="admin-stats"></div>
+					<h3
+						style="
+							font-family: &quot;Playfair Display&quot;, serif;
+							font-size: 18px;
+							color: var(--brown-dark);
+							margin-bottom: 12px;
+						"
+					>
+						Recent Orders
+					</h3>
+					<div id="admin-recent-orders" style="overflow-x: auto"></div>
+				</div>
+				<div id="orders-admin" class="admin-section">
+					<h2>All Orders</h2>
+					<div id="admin-orders-table" style="overflow-x: auto"></div>
+				</div>
+				<div id="users-admin" class="admin-section">
+					<h2>Registered Users</h2>
+					<div id="admin-users-table" style="overflow-x: auto"></div>
+				</div>
+				<div id="inventory-admin" class="admin-section">
+					<h2>Inventory</h2>
+					<div id="admin-inventory-table" style="overflow-x: auto"></div>
+				</div>
+				<div id="suppliers-admin" class="admin-section">
+					<h2>Suppliers</h2>
+					<div style="overflow-x: auto">
+						<table class="data-table">
+							<thead>
+								<tr>
+									<th>Supplier Name</th>
+									<th>Category</th>
+									<th>Location</th>
+									<th>Contact</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Fully Booked</td>
+									<td>Fiction, Non-Fiction</td>
+									<td>Manila</td>
+									<td>orders@fullybooked.com.ph</td>
+									<td>
+										<span
+											class="badge badge-cat"
+											style="background: #d4edda; color: #155724"
+											>Active</span
+										>
+									</td>
+								</tr>
+								<tr>
+									<td>National Book Store</td>
+									<td>Academic, Children</td>
+									<td>Nationwide</td>
+									<td>info@nbs.com.ph</td>
+									<td>
+										<span
+											class="badge badge-cat"
+											style="background: #d4edda; color: #155724"
+											>Active</span
+										>
+									</td>
+								</tr>
+								<tr>
+									<td>Anvil Publishing</td>
+									<td>Filipino Literature</td>
+									<td>Pasig City</td>
+									<td>sales@anvilpublishing.com</td>
+									<td>
+										<span
+											class="badge badge-cat"
+											style="background: #d4edda; color: #155724"
+											>Active</span
+										>
+									</td>
+								</tr>
+								<tr>
+									<td>Oxford University Press</td>
+									<td>Academic</td>
+									<td>International</td>
+									<td>info@oup.com</td>
+									<td>
+										<span
+											class="badge badge-cat"
+											style="background: #d4edda; color: #155724"
+											>Active</span
+										>
+									</td>
+								</tr>
+								<tr>
+									<td>Penguin Random House</td>
+									<td>Fiction, Self-Help</td>
+									<td>International</td>
+									<td>orders@penguinrandomhouse.com</td>
+									<td>
+										<span
+											class="badge badge-cat"
+											style="background: #d4edda; color: #155724"
+											>Active</span
+										>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="login-modal" class="modal-overlay hidden">
+			<div class="modal-box">
+				<button class="modal-close" onclick="closeModal('login-modal')">
+					✕
+				</button>
+				<div class="modal-title">Welcome Back</div>
+				<div class="modal-subtitle">Sign in to your BookHaven account</div>
+				<div class="form-group">
+					<label>Email Address</label>
+					<input type="email" id="login-email" placeholder="your@email.com" />
+					<span class="form-error" id="login-email-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input
+						type="password"
+						id="login-password"
+						placeholder="Your password"
+					/>
+					<span class="form-error" id="login-password-err"></span>
+				</div>
+				<span class="form-error" id="login-general-err"></span>
+				<button class="btn-submit" onclick="doLogin()">Sign In</button>
+				<div class="form-toggle">
+					Don't have an account?
+					<a onclick="switchModal('login-modal', 'register-modal')"
+						>Create one</a
+					>
+				</div>
+				<div
+					class="form-toggle"
+					style="margin-top: 8px; font-size: 12px; color: var(--text-light)"
+				>
+					Admin: admin@bookhaven.ph / admin123
+				</div>
+			</div>
+		</div>
+
+		<div id="register-modal" class="modal-overlay hidden">
+			<div class="modal-box">
+				<button class="modal-close" onclick="closeModal('register-modal')">
+					✕
+				</button>
+				<div class="modal-title">Create Account</div>
+				<div class="modal-subtitle">Join thousands of Filipino readers</div>
+				<div class="form-group">
+					<label>Full Name</label>
+					<input type="text" id="reg-name" placeholder="Juan dela Cruz" />
+					<span class="form-error" id="reg-name-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Email Address</label>
+					<input type="email" id="reg-email" placeholder="your@email.com" />
+					<span class="form-error" id="reg-email-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input
+						type="password"
+						id="reg-password"
+						placeholder="At least 6 characters"
+					/>
+					<span class="form-error" id="reg-password-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Confirm Password</label>
+					<input
+						type="password"
+						id="reg-confirm"
+						placeholder="Repeat password"
+					/>
+					<span class="form-error" id="reg-confirm-err"></span>
+				</div>
+				<button class="btn-submit" onclick="doRegister()">
+					Create Account
+				</button>
+				<div class="form-toggle">
+					Already have an account?
+					<a onclick="switchModal('register-modal', 'login-modal')">Sign in</a>
+				</div>
+			</div>
+		</div>
+
+		<div id="book-modal" class="modal-overlay hidden">
+			<div class="modal-box book-detail-modal">
+				<button class="modal-close" onclick="closeModal('book-modal')">
+					✕
+				</button>
+				<div id="book-modal-content"></div>
+			</div>
+		</div>
+
+		<div id="checkout-modal" class="modal-overlay hidden">
+			<div class="modal-box">
+				<button class="modal-close" onclick="closeModal('checkout-modal')">
+					✕
+				</button>
+				<div class="modal-title">Complete Your Order</div>
+				<div class="modal-subtitle">Fill in your delivery details</div>
+				<div class="form-group">
+					<label>Full Name</label>
+					<input type="text" id="co-name" placeholder="Juan dela Cruz" />
+					<span class="form-error" id="co-name-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Delivery Address</label>
+					<input
+						type="text"
+						id="co-address"
+						placeholder="House No., Street, Barangay, City"
+					/>
+					<span class="form-error" id="co-address-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Phone Number</label>
+					<input type="text" id="co-phone" placeholder="+63 9XX XXX XXXX" />
+					<span class="form-error" id="co-phone-err"></span>
+				</div>
+				<div class="form-group">
+					<label>Payment Method</label>
+					<select id="co-payment">
+						<option value="">-- Select Payment --</option>
+						<option value="GCash">GCash</option>
+						<option value="PayMaya">PayMaya</option>
+						<option value="Bank Transfer">Bank Transfer</option>
+						<option value="COD">Cash on Delivery (COD)</option>
+					</select>
+					<span class="form-error" id="co-payment-err"></span>
+				</div>
+				<button class="btn-submit" onclick="placeOrder()">Place Order</button>
+			</div>
+		</div>
+
+		<div id="toast"></div>
+
+		<footer>
+			<div class="footer-inner">
+				<div class="footer-grid">
+					<div>
+						<div class="footer-logo">📖 BookHaven<span>.ph</span></div>
+						<div class="footer-about">
+							Your cozy online bookstore serving readers across the Philippines.
+							Quality books, delivered with care.
+						</div>
+					</div>
+					<div class="footer-col">
+						<h4>Shop</h4>
+						<a
+							onclick="
+								filterCategory(
+									'Fiction',
+									document.querySelectorAll('.cat-btn')[1],
+								)
+							"
+							>Fiction</a
+						>
+						<a
+							onclick="
+								filterCategory(
+									'Non-Fiction',
+									document.querySelectorAll('.cat-btn')[2],
+								)
+							"
+							>Non-Fiction</a
+						>
+						<a
+							onclick="
+								filterCategory(
+									'Children',
+									document.querySelectorAll('.cat-btn')[3],
+								)
+							"
+							>Children</a
+						>
+						<a
+							onclick="
+								filterCategory(
+									'Self-Help',
+									document.querySelectorAll('.cat-btn')[4],
+								)
+							"
+							>Self-Help</a
+						>
+						<a
+							onclick="
+								filterCategory(
+									'Academic',
+									document.querySelectorAll('.cat-btn')[5],
+								)
+							"
+							>Academic</a
+						>
+					</div>
+					<div class="footer-col">
+						<h4>Company</h4>
+						<a onclick="showPage('about')">About Us</a>
+						<a onclick="showPage('contact')">Contact</a>
+						<a onclick="showPage('about')">Our Story</a>
+						<a onclick="showPage('about')">Suppliers</a>
+					</div>
+					<div class="footer-col">
+						<h4>Help</h4>
+						<a onclick="showPage('orders')">Track Order</a>
+						<a onclick="showPage('about')">FAQ</a>
+						<a>Return Policy</a>
+						<a>Privacy Policy</a>
+						<a
+							href="https://www.facebook.com/search/top?q=bookhaven.ph"
+							target="_blank"
+							>Facebook</a
+						>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<span>© 2025 BookHaven.ph — All rights reserved</span>
+					<span
+						>📍 143 ACT Now, Cebu City, Philippines | 📞 +63 917 123 4567 | 📧
+						hello@bookhaven.ph</span
+					>
+				</div>
+			</div>
+		</footer>
+
+		<script src="app.js"></script>
+	</body>
+</html>
